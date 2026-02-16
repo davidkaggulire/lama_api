@@ -229,6 +229,8 @@ class Scenario(db.Model):
             "startTime": self.start_time.strftime("%H:%M"),
             "endTime": self.end_time.strftime("%H:%M"),
             "description": self.description,
-            "urgency": self.urgency,
+            # "urgency": self.urgency,
+            # Normalize to lowercase here so React's urgencyConfig[level] works
+            "urgency": self.urgency.lower() if self.urgency else "low",
             "createdAt": self.created_at.isoformat() if self.created_at else None
         }
