@@ -3,7 +3,7 @@ import { UrgencyBadge, DisruptionTypeBadge } from "@/components/StatusBadges";
 import { Clock, MapPin, User } from "lucide-react";
 import type { DisruptionScenario } from "@/types/disruption";
 import { motion } from "framer-motion";
-import { ScenarioResponse } from "@/services/scenarioService";
+import type { ScenarioResponse } from "@/services/scenarioService";
 
 
 interface ScenarioCardProps {
