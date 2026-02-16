@@ -16,11 +16,17 @@ app = Flask(__name__)
 api = Api(app)
 app.config.from_object(app_config["testing"])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-CORS(app)
+app.config['SQLALCHEMY_ECHO'] = True
+CORS(app,resources={r"/api/*": {"origins": "http://localhost:8080"}})
+# CORS(app)
 bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
 # db.create_all()
+with app.app_context():
+    print(app.url_map)
 
-from .routes import assignment
+from .routes import assignments
+from .routes import consultants
+from .routes import scenarios
