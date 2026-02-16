@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import DisruptionResponse from "./pages/DisruptionResponse";
 import NotFound from "./pages/NotFound";
-
+import ReportIncidentPage from './pages/ReportIncidentPage';
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -18,6 +18,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/response/:scenarioId" element={<DisruptionResponse />} />
+          <Route path="/report-incident" element={<ReportIncidentPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

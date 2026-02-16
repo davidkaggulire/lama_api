@@ -1,24 +1,49 @@
 import { useState, useCallback } from "react";
+import React, { useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { ScenarioCard } from "@/components/ScenarioCard";
 import { HistorySidebar } from "@/components/HistorySidebar";
-import { scenarios, historyItems } from "@/data/mockData";
+// import { scenarios, historyItems } from "@/data/mockData";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { History, Zap } from "lucide-react";
-import type { DisruptionScenario } from "@/types/disruption";
+// import type { DisruptionScenario } from "@/types/disruption";
+import { getScenarios, ScenarioResponse } from '../services/scenarioService';
+
 
 const Index = () => {
     const navigate = useNavigate();
     const [historyOpen, setHistoryOpen] = useState(false);
 
     const handleSelectScenario = useCallback(
-        (scenario: DisruptionScenario) => {
+        (scenario: ScenarioResponse) => {
             navigate(`/response/${scenario.id}`);
         },
         [navigate],
     );
 
+const [scenarios, setScenarios] = useState<ScenarioResponse[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // 1. Fetch data on component mount
+    useEffect(() => {
+        const fetchInitialData = async () => {
+            try {
+                setLoading(true);
+                const data = await getScenarios();
+                setScenarios(data);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to load scenarios');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchInitialData();
+    }, []);
+
+    
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
@@ -37,7 +62,7 @@ const Index = () => {
                         </SheetTrigger>
                         <SheetContent side="right" className="p-0 w-80">
                             <SheetTitle className="sr-only">Response History</SheetTitle>
-                            <HistorySidebar items={historyItems} />
+                            {/* <HistorySidebar items={historyItems} /> */}
                         </SheetContent>
                     </Sheet>
                 </div>
@@ -53,9 +78,25 @@ const Index = () => {
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
-                    {scenarios.map((s) => (
+                    {/* {scenarios.map((s) => (
                         <ScenarioCard key={s.id} scenario={s} onSelect={handleSelectScenario} />
-                    ))}
+                    ))} */}
+
+                    {scenarios.length > 0 ? (
+                    scenarios.map((s) => (
+                        <ScenarioCard 
+                            key={s.id} 
+                            scenario={s} 
+                            onSelect={handleSelectScenario} 
+                        />
+                    ))
+                ) : (
+                    <p className="col-span-full text-center text-gray-400 py-10">
+                        No active scenarios found.
+                    </p>
+                )}
+
+
                 </div>
             </main>
         </div>

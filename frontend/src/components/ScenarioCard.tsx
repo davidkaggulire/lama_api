@@ -3,10 +3,12 @@ import { UrgencyBadge, DisruptionTypeBadge } from "@/components/StatusBadges";
 import { Clock, MapPin, User } from "lucide-react";
 import type { DisruptionScenario } from "@/types/disruption";
 import { motion } from "framer-motion";
+import { ScenarioResponse } from "@/services/scenarioService";
+
 
 interface ScenarioCardProps {
-    scenario: DisruptionScenario;
-    onSelect: (scenario: DisruptionScenario) => void;
+    scenario: ScenarioResponse;
+    onSelect: (scenario: ScenarioResponse) => void;
 }
 
 export function ScenarioCard({ scenario, onSelect }: ScenarioCardProps) {
@@ -36,7 +38,7 @@ export function ScenarioCard({ scenario, onSelect }: ScenarioCardProps) {
                     </div>
                     <div className="flex items-center gap-2">
                         <Clock className="h-3.5 w-3.5 shrink-0" />
-                        <span>{scenario.shiftTime}</span>
+                        <span>{scenario.startTime} - {scenario.endTime}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <MapPin className="h-3.5 w-3.5 shrink-0" />

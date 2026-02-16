@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
-import type { UrgencyLevel, DisruptionType } from "@/types/disruption";
+import type { UrgencyLevel, DisruptionType } from "@/services/scenarioService";
+
 
 const urgencyConfig: Record<UrgencyLevel, { label: string; className: string }> = {
     high: { label: "High", className: "bg-urgency-high text-white border-transparent" },

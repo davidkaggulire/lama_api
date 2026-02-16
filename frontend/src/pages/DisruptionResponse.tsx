@@ -11,7 +11,8 @@ import { DecisionStage } from "@/components/stages/DecisionStage";
 import { ConfirmationStage } from "@/components/stages/ConfirmationStage";
 import { StageLoader } from "@/components/stages/StageLoader";
 import { toast } from "@/hooks/use-toast";
-import type { DisruptionResponse } from "@/types/disruption";
+import api from '../api/axios.js';
+// import type { DisruptionResponse } from "@/types/disruption";
 
 const stageLabels = [
     "Event Summary",
@@ -27,15 +28,28 @@ export default function DisruptionResponsePage() {
     const navigate = useNavigate();
     const scenario = scenarios.find((s) => s.id === scenarioId);
 
-    const [response, setResponse] = useState<DisruptionResponse | null>(null);
+    // const [assignment, setAssignment] = useState<DisruptionResponse | null>(null);
+        const [assignment, setAssignment] = useState(null);
+
     const [currentStage, setCurrentStage] = useState(0);
 
     // Simulate staged n8n responses
     useEffect(() => {
         if (!scenario) return;
 
-        const data = { ...mockFullResponse, scenarioId: scenario.id };
-        setResponse(data);
+        // const data = { ...mockFullResponse, scenarioId: scenario.id };
+        // setResponse(data);
+        const getAssignment= async()=>{
+            try {
+        const assignmentRes = await api.get('/assignments'); 
+        const assignment = assignmentRes.data;
+        console.log("API Response:", assignment);
+        setAssignment(assignment);
+    } catch (error) {
+        console.error("API Call failed:", error);
+    }
+        }
+        
 
         // Reveal stages progressively
         const timers = [0, 800, 1600, 2400, 3200].map((delay, i) =>
@@ -111,29 +125,29 @@ export default function DisruptionResponsePage() {
             {/* Pipeline */}
             <main className="container py-6 max-w-3xl space-y-4">
                 {/* Stage 1 */}
-                {currentStage >= 1 && response?.eventSummary ? (
-                    <EventSummaryStage data={response.eventSummary} />
+                {currentStage >= 1 && assignment?.eventSummary ? (
+                    <EventSummaryStage data={assignment.eventSummary} />
                 ) : (
                     <StageLoader stage={1} label={stageLabels[0]} />
                 )}
 
                 {/* Stage 2 */}
-                {currentStage >= 2 && response?.impactAssessment ? (
-                    <ImpactStage data={response.impactAssessment} />
+                {currentStage >= 2 && assignment?.impactAssessment ? (
+                    <ImpactStage data={assignment.impactAssessment} />
                 ) : currentStage >= 1 ? (
                     <StageLoader stage={2} label={stageLabels[1]} />
                 ) : null}
 
                 {/* Stage 3 */}
-                {currentStage >= 3 && response?.candidates ? (
-                    <CandidateStage candidates={response.candidates} />
+                {currentStage >= 3 && assignment?.candidates ? (
+                    <CandidateStage candidates={assignment.candidates} />
                 ) : currentStage >= 2 ? (
                     <StageLoader stage={3} label={stageLabels[2]} />
                 ) : null}
 
                 {/* Stage 4 */}
-                {currentStage >= 4 && response?.actionPlan ? (
-                    <ActionPlanStage data={response.actionPlan} />
+                {currentStage >= 4 && assignment?.actionPlan ? (
+                    <ActionPlanStage data={assignment.actionPlan} />
                 ) : currentStage >= 3 ? (
                     <StageLoader stage={4} label={stageLabels[3]} />
                 ) : null}
@@ -146,8 +160,8 @@ export default function DisruptionResponsePage() {
                 ) : null}
 
                 {/* Stage 6 — Confirmation */}
-                {currentStage >= 6 && response?.confirmation ? (
-                    <ConfirmationStage data={response.confirmation} />
+                {currentStage >= 6 && assignment?.confirmation ? (
+                    <ConfirmationStage data={assignment.confirmation} />
                 ) : null}
             </main>
         </div>
