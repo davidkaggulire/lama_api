@@ -16,6 +16,9 @@ export default defineConfig(({ mode }) => ({
                 target: 'http://127.0.0.1:5000', // Your Flask server URL
                 changeOrigin: true,
                 secure: false,
+                // Add these lines to prevent the "Socket Hang Up"
+                timeout: 120000,         // Wait 120 seconds for the response
+                proxyTimeout: 120000,    // Wait 120 seconds for the connection
             }
         }
     },
