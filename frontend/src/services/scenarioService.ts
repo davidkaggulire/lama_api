@@ -1,3 +1,5 @@
+import { DisruptionResponse } from "@/types/disruption";
+
 // src/services/scenarioService.ts
 export type UrgencyLevel = "high" | "medium" | "low";
 export type DisruptionType = "sick" | "no-show" | "late";
@@ -53,10 +55,25 @@ export const createScenario = async (payload: ScenarioPayload) => {
     }
 };
 
-export const getScenarios = async () => {
-    // const response = await fetch(`${API_BASE_URL}/scenarios`);
-    // if (!response.ok) throw new Error('Failed to fetch scenarios');
-    // return await response.json();
+// export const getScenarios = async () => {
+//     // const response = await fetch(`${API_BASE_URL}/scenarios`);
+//     // if (!response.ok) throw new Error('Failed to fetch scenarios');
+//     // return await response.json();
+//     try {
+//         const response = await fetch(`${API_BASE_URL}/scenarios`);
+//         console.log("Fetch Scenarios Response:", response);
+//         if (!response.ok) {
+//             throw new Error('Failed to fetch scenarios');
+//         }
+        
+//         return await response.json();
+//     } catch (error) {
+//         console.error("Fetch Service Error:", error);
+//         throw error;
+//     }
+// };
+
+export const getScenarios = async (): Promise<ScenarioResponse[]> => {
     try {
         const response = await fetch(`${API_BASE_URL}/scenarios`);
         console.log("Fetch Scenarios Response:", response);
@@ -71,17 +88,26 @@ export const getScenarios = async () => {
     }
 };
 
-// export const getScenarios = async (): Promise<ScenarioResponse[]> => {
-//     try {
-//         const response = await fetch(`${API_BASE_URL}/scenarios`);
-//         console.log("Fetch Scenarios Response:", response);
-//         if (!response.ok) {
-//             throw new Error('Failed to fetch scenarios');
-//         }
+// fetch a single scenario
+export const getScenarioById = async(id:string): Promise<ScenarioResponse> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/scenarios/${id}`);
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch scenarios ${id}`);
+        }
         
-//         return await response.json();
-//     } catch (error) {
-//         console.error("Fetch Service Error:", error);
-//         throw error;
-//     }
-// };
+        return await response.json();
+    } catch (error) {
+        console.error("Fetch Service Error:", error);
+        throw error;
+    }
+}
+
+// perform analysis for scenario - required by manager
+export const getAnalysisScenario = async (id: string): Promise<DisruptionResponse> => {
+    const response = await fetch(`/api/v1/analysis/${id}`);
+    if (!response.ok) throw new Error("Analysis failed");
+    return response.json();
+}
+
