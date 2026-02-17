@@ -51,6 +51,7 @@ export default function DisruptionResponsePage() {
       try {
         setLoading(true);
         const data = await getScenarioById(scenarioId);
+        console.log("the data is", data);
         setScenario(data);
       } catch (err: unknown) {
         // Check if it's a standard JS Error object
@@ -72,6 +73,7 @@ export default function DisruptionResponsePage() {
       try {
         setLoading(true);
         const data = await getAnalysisScenario(scenarioId);
+        console.log(data);
         setResponse(data);
       } catch (err: unknown) {
         // Check if it's a standard JS Error object
