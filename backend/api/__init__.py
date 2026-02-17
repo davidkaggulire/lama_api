@@ -30,3 +30,4 @@ with app.app_context():
 from .routes import assignments
 from .routes import consultants
 from .routes import scenarios
+from .routes import analysis
