@@ -16,7 +16,7 @@ app = Flask(__name__)
 # ==========================================
 
 consultant_services = db.Table(
-    "junction_consultant_services",
+    "consultant_services",
     db.Column(
         "consultant_id",
         db.String(50),
@@ -24,15 +24,15 @@ consultant_services = db.Table(
         primary_key=True,
     ),
     db.Column(
-        "service_code",
+        "service_id",
         db.String(50),
-        db.ForeignKey("services.service_code"),
+        db.ForeignKey("services.service_id"),
         primary_key=True,
     ),
 )
 
 consultant_regions = db.Table(
-    "junction_consultant_regions",
+    "consultant_regions",
     db.Column(
         "consultant_id",
         db.String(50),
@@ -48,7 +48,7 @@ consultant_regions = db.Table(
 )
 
 consultant_pools = db.Table(
-    "junction_consultant_pools",
+    "consultant_pools",
     db.Column(
         "consultant_id",
         db.String(50),
@@ -61,7 +61,7 @@ consultant_pools = db.Table(
 )
 
 consultant_access = db.Table(
-    "junction_consultant_access",
+    "consultant_access",
     db.Column(
         "consultant_id",
         db.String(50),
@@ -86,7 +86,8 @@ consultant_access = db.Table(
 
 class Service(db.Model):
     __tablename__ = "services"
-    service_code = db.Column(db.String(50), primary_key=True)
+    service_id = db.Column(db.String(50), primary_key=True)
+    service_type = db.Column(db.String(50))
     description = db.Column(db.Text)
 
 
@@ -122,7 +123,7 @@ class Assignment(db.Model):
         db.String(50), db.ForeignKey("consultants.consultant_id"), nullable=False
     )
 
-    service_code = db.Column(db.String(255), nullable=False)
+    service_id = db.Column(db.String(255), nullable=False)
     date = db.Column(db.Date, nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
