@@ -108,6 +108,7 @@ export const getScenarioById = async(id:string): Promise<ScenarioResponse> => {
 export const getAnalysisScenario = async (id: string): Promise<DisruptionResponse> => {
     const response = await fetch(`/api/v1/analysis/${id}`);
     if (!response.ok) throw new Error("Analysis failed");
+    console.log(response.json());
     return response.json();
 }
 
