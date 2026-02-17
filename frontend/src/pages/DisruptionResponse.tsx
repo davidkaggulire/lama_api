@@ -31,7 +31,6 @@ const stageLabels = [
 
 export default function DisruptionResponsePage() {
   const { scenarioId } = useParams<{ scenarioId: string }>();
-  console.log("SCEANRIO IS ", scenarioId);
   const navigate = useNavigate();
   //   const scenario = scenarios.find((s) => s.id === scenarioId);
 
