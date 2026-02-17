@@ -4,7 +4,7 @@ from flask_restful import Resource
 from datetime import datetime
 from ..models import Scenario, Consultant, Region, Availability # Assuming these are your models
 from api import api
-from backend.agents.controller import run_analysis_mcp
+from agents.controller import run_analysis_mcp
 
 
 class DisruptionAnalysisResource(Resource):

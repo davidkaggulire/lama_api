@@ -96,7 +96,7 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 # 1. Import the template formatter from your other file
-from backend.agents.agent import get_prompt 
+from agents.agent import get_prompt 
 
 # # Define how to launch your MCP server
 # server_params = StdioServerParameters(
@@ -140,7 +140,7 @@ async def run_analysis_mcp(scenario_id):
             messages = [{'role': 'user', 'content': f"Analyze scenario {scenario_id}"}]
             
             response = ollama.chat(
-                model='llama3.1',
+                model='llama3.2',
                 messages=messages,
                 tools=ollama_tools
             )
@@ -173,7 +173,7 @@ async def run_analysis_mcp(scenario_id):
                     ]
 
                     final_response = ollama.chat(
-                        model='llama3.1',
+                        model='llama3.2',
                         messages=final_messages,
                         format='json',
                         options={'temperature': 0}
