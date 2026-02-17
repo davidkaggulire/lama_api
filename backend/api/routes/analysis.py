@@ -1,7 +1,10 @@
+import asyncio
+
 from flask_restful import Resource
 from datetime import datetime
 from ..models import Scenario, Consultant, Region, Availability # Assuming these are your models
 from api import api
+from backend.agents.controller import run_analysis_mcp
 
 
 class DisruptionAnalysisResource(Resource):
@@ -11,68 +14,84 @@ class DisruptionAnalysisResource(Resource):
 
         real_candidates = self._get_mock_candidates(scenario)
 
-        # 2. Determine Reasoning and Candidates safely
-        if not real_candidates:
-            primary_candidate = None
-            backup_candidate = None
-            primary_reasoning = "No available consultants found in this region for the specified date."
-        else:
-            primary_candidate = real_candidates[0]
-            # Use .get() or index check for backup to prevent index errors
-            backup_candidate = real_candidates[1] if len(real_candidates) > 1 else None
-            primary_reasoning = f"{primary_candidate['name']} is the strongest match at {primary_candidate['skillsMatch']}% fit. They have the required service certifications and are located in the {primary_candidate['region']} region."
-        
-        # 3. Build the nested response
-        response = {
-            "id": f"resp-{scenario.scenario_id}",
-            "scenarioId": scenario.scenario_id,
-            "status": "in-progress",
-            "timestamp": datetime.utcnow().isoformat() + "Z",
-            "currentStage": 1,
-            
-            # Use data from your Scenario and Consultant models
-            "eventSummary": {
-                "employee": f"{scenario.consultant.first_name} {scenario.consultant.last_name}",
-                "role": scenario.consultant.employment_type or "Consultant",
-                "shift": f"{scenario.start_time.strftime('%H:%M')} – {scenario.end_time.strftime('%H:%M')}",
-                "site": scenario.customer.customer_name,
-                "time": f"Reported at {scenario.created_at.strftime('%I:%M %p')}",
-                "type": scenario.type.lower(),
-                "urgency": scenario.urgency.lower(),
-                "details": scenario.description,
-            },
+        # This triggers the controller, which triggers the MCP tool, 
+        # which uses the Hugo Markdown template.
+        result = asyncio.run(run_analysis_mcp(scenario_id))
+        return result, 200
 
-            # This part is usually logic-driven or AI-generated
-            "impactAssessment": self._generate_impact(scenario),
-            
-            "candidates": real_candidates, 
-            
-            "actionPlan": {
-                # Logic to pick the top candidate from the list
-                "primaryCandidate": primary_candidate,
-                "backupCandidate": backup_candidate,
-                "primaryReasoning": primary_reasoning,
-                "backupReasoning": "Secondary available candidate within the pool." if backup_candidate else "No backup available.",
-                "assignmentDetails": f"Assign to {scenario.customer.customer_name} shift at {scenario.start_time.strftime('%H:%M')}."
-            },
-            
-            "confirmation": {
-                "status": "success",
-                "summary": "Disruption resolved. Stakeholders notified."
-            }
-        }
-        
-        return response, 200
+        # # 2. Trigger the AI Agent (Hugo)
+        # # We pass the real DB objects converted to dictionaries
+        # ai_plan_json = run_hugo_analysis(scenario.to_dict(), real_candidates)
+        # print(ai_plan_json)
 
-    def _generate_impact(self, scenario):
-        # Example of simple conditional logic
-        risk = "high" if scenario.urgency == "HIGH" else "medium"
-        return {
-            "affectedShift": "Current Shift",
-            "customerImpact": f"Service delivery at {scenario.customer.customer_name}",
-            "riskLevel": risk,
-            "details": "Automated risk assessment based on client SLA."
-        }
+        # # 3. Return the AI's response to your React Frontend
+        # return {
+        #     "analysis": ai_plan_json,
+        #     "raw_candidates": real_candidates
+        # }, 200
+
+    #     # 2. Determine Reasoning and Candidates safely
+    #     if not real_candidates:
+    #         primary_candidate = None
+    #         backup_candidate = None
+    #         primary_reasoning = "No available consultants found in this region for the specified date."
+    #     else:
+    #         primary_candidate = real_candidates[0]
+    #         # Use .get() or index check for backup to prevent index errors
+    #         backup_candidate = real_candidates[1] if len(real_candidates) > 1 else None
+    #         primary_reasoning = f"{primary_candidate['name']} is the strongest match at {primary_candidate['skillsMatch']}% fit. They have the required service certifications and are located in the {primary_candidate['region']} region."
+        
+    #     # 3. Build the nested response
+    #     response = {
+    #         "id": f"resp-{scenario.scenario_id}",
+    #         "scenarioId": scenario.scenario_id,
+    #         "status": "in-progress",
+    #         "timestamp": datetime.utcnow().isoformat() + "Z",
+    #         "currentStage": 1,
+            
+    #         # Use data from your Scenario and Consultant models
+    #         "eventSummary": {
+    #             "employee": f"{scenario.consultant.first_name} {scenario.consultant.last_name}",
+    #             "role": scenario.consultant.employment_type or "Consultant",
+    #             "shift": f"{scenario.start_time.strftime('%H:%M')} – {scenario.end_time.strftime('%H:%M')}",
+    #             "site": scenario.customer.customer_name,
+    #             "time": f"Reported at {scenario.created_at.strftime('%I:%M %p')}",
+    #             "type": scenario.type.lower(),
+    #             "urgency": scenario.urgency.lower(),
+    #             "details": scenario.description,
+    #         },
+
+    #         # This part is usually logic-driven or AI-generated
+    #         "impactAssessment": self._generate_impact(scenario),
+            
+    #         "candidates": real_candidates, 
+            
+    #         "actionPlan": {
+    #             # Logic to pick the top candidate from the list
+    #             "primaryCandidate": primary_candidate,
+    #             "backupCandidate": backup_candidate,
+    #             "primaryReasoning": primary_reasoning,
+    #             "backupReasoning": "Secondary available candidate within the pool." if backup_candidate else "No backup available.",
+    #             "assignmentDetails": f"Assign to {scenario.customer.customer_name} shift at {scenario.start_time.strftime('%H:%M')}."
+    #         },
+            
+    #         "confirmation": {
+    #             "status": "success",
+    #             "summary": "Disruption resolved. Stakeholders notified."
+    #         }
+    #     }
+        
+    #     return response, 200
+
+    # def _generate_impact(self, scenario):
+    #     # Example of simple conditional logic
+    #     risk = "high" if scenario.urgency == "HIGH" else "medium"
+    #     return {
+    #         "affectedShift": "Current Shift",
+    #         "customerImpact": f"Service delivery at {scenario.customer.customer_name}",
+    #         "riskLevel": risk,
+    #         "details": "Automated risk assessment based on client SLA."
+    #     }
 
     
     def _get_mock_candidates(self, scenario):
