@@ -39,7 +39,7 @@ class AssignmentList(Resource):
                     {
                         "assignment_id": a.assignment_id,
                         "customer_id": a.customer_id,
-                        "service_code": a.service_code,
+                        "service_id": a.service_id,
                         "date": str(a.date),
                         "status": a.status,
                     }
@@ -73,7 +73,7 @@ class AssignmentDetail(Resource):
                 "assignment_id": assignment.assignment_id,
                 "customer_id": assignment.customer_id,
                 "consultant_id": assignment.consultant_id,
-                "service_code": assignment.service_code,
+                "service_code": assignment.service_id,
                 "date": str(assignment.date),
                 "start_time": str(assignment.start_time),
                 "end_time": str(assignment.end_time),
