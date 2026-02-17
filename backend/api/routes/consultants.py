@@ -15,16 +15,16 @@ class ConsultantList(Resource):
     # @token_required
     def get(self):
         """Get all consultants with optional filtering by service or region"""
-        service_code = request.args.get("service")  # e.g., /consultants?service=Picker
+        service_id = request.args.get("service")  # e.g., /consultants?service=Picker
         region_code = request.args.get("region")  # e.g., /consultants?region=SE-MAL
 
         try:
             query = Consultant.query
 
             # Filter by Service (Join the junction table)
-            if service_code:
+            if service_id:
                 query = query.join(Consultant.services).filter(
-                    Service.service_code == service_code
+                    Service.service_id == service_id
                 )
 
             # Filter by Region (Join the junction table)
@@ -44,7 +44,7 @@ class ConsultantList(Resource):
                         "last_name": c.last_name,
                         "employment_type": c.employment_type,
                         # Helper logic to turn related objects into simple lists
-                        "services": [s.service_code for s in c.services],
+                        "services": [s.service_id for s in c.services],
                         "regions": [r.region_code for r in c.regions],
                         "pools": [p.pool_id for p in c.pools],
                     }
@@ -72,7 +72,7 @@ class ConsultantDetail(Resource):
                 "first_name": consultant.first_name,
                 "last_name": consultant.last_name,
                 "employment_type": consultant.employment_type,
-                "services": [s.service_code for s in consultant.services],
+                "services": [s.service_id for s in consultant.services],
                 "regions": [r.region_code for r in consultant.regions],
             }
         )
